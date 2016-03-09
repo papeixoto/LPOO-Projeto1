@@ -1,6 +1,5 @@
 package maze.cli;
-//second change
-
+ //second change
  //first change
  //third change
 import java.util.Scanner;
