@@ -2,6 +2,7 @@ package maze.cli;
  //second change
  //first change
  //third change
+//5
 import java.util.Scanner;
 
 import maze.logic.Maze;
