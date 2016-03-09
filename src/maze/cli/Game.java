@@ -1,5 +1,8 @@
 package maze.cli;
 
+
+ //first change
+
 import java.util.Scanner;
 
 import maze.logic.Maze;
