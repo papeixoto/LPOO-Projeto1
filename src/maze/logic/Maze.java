@@ -24,6 +24,19 @@ public class Maze {
 		board[8][1] = sword.getSymbol();
 	}
 	
+	public Maze(char [][] board){
+		this.board=board;
+		
+		for(int x=0; x<board.length; x++)
+			for(int y=0; y<board[0].length;y++){
+				switch (board[x][y]){
+				case 'H': hero=new Hero(x,y); break;
+				case 'D': dragon=new Dragon(x,y); break;
+				case 'E': sword=new Sword(x,y);break;
+				}
+			}
+	}
+	
 	public char[][] getBoard(){
 		return board;
 	}
