@@ -24,8 +24,26 @@ public class Maze {
 		board[8][1] = sword.getSymbol();
 	}
 	
+	public Maze(char [][] board){
+		this.board=board;
+		
+		for(int x=0; x<board.length; x++)
+			for(int y=0; y<board[0].length;y++){
+				switch (board[x][y]){
+				case 'H': hero=new Hero(x,y); break;
+				case 'D': dragon=new Dragon(x,y); break;
+				case 'E': sword=new Sword(x,y);break;
+				}
+			}
+	}
+	
 	public char[][] getBoard(){
 		return board;
+	}
+	
+	public Dragon getDragon()
+	{
+		return dragon;
 	}
 
 	private char getCell(int x, int y){
@@ -169,7 +187,7 @@ public class Maze {
 		}
 	}
 
-	private boolean heroNextToDragon(){
+	public boolean heroNextToDragon(){
 		if(board[hero.getX()+1][hero.getY()]=='D') return true;
 		if(board[hero.getX()-1][hero.getY()]=='D') return true;
 		if(board[hero.getX()][hero.getY()+1]=='D') return true;
@@ -181,7 +199,7 @@ public class Maze {
 		return false;
 	}
 
-	private void killDragons(){
+	public void killDragons(){
 		if(hero.getArmed()){
 			if(board[hero.getX()+1][hero.getY()]=='D') {board[hero.getX()+1][hero.getY()]=' '; dragon.setAlive(false);}
 			if(board[hero.getX()-1][hero.getY()]=='D') {board[hero.getX()-1][hero.getY()]=' '; dragon.setAlive(false);}

@@ -3,7 +3,7 @@ package maze.cli;
  //first change
  //third change
 //5
-//ja da
+
 import java.util.Scanner;
 
 import maze.logic.Maze;
