@@ -1,11 +1,11 @@
 package maze.logic;
 
-public class PosElements {
+public class Piece {
 	protected int posX;
 	protected int posY;
 	protected char symbol;
 	
-	PosElements (int x, int y){
+	Piece (int x, int y){
 		posX=x;
 		posY=y;
 	}

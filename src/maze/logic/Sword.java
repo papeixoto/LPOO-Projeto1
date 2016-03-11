@@ -1,6 +1,6 @@
 package maze.logic;
 
-public class Sword extends PosElements{
+public class Sword extends Piece{
 
 	private boolean available;
 	

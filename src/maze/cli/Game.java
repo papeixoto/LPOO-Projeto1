@@ -6,7 +6,9 @@ package maze.cli;
 
 import java.util.Scanner;
 
+import maze.logic.IMazeBuilder;
 import maze.logic.Maze;
+import maze.logic.MazeBuilder;
 
 public class Game {
 
@@ -15,8 +17,9 @@ public class Game {
 	boolean b=false;
 	
 	public static void main(String[] args) {
-		maze = new Maze();
-		String str=getDifficulty();
+		MazeBuilder mazeBuilder = new MazeBuilder();
+		maze = new Maze(mazeBuilder.buildMaze(31));
+		/*		String str=getDifficulty();
 		printBoard(maze.getBoard());
 			while(!maze.getGameOver()){
 				if(str.equals("Easy"))
@@ -31,12 +34,15 @@ public class Game {
 				
 					
 		printBoard(maze.getBoard());
+
 		}
-		
-		printEndGameMessage();
+*/		
+		printBoard(maze.getBoard());
+	//	printEndGameMessage();
 			
 		s.close();
 	}
+
 
 	private static char getChar(){
 		System.out.println("movimento:");

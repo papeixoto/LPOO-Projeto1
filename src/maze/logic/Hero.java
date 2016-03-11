@@ -1,6 +1,6 @@
 package maze.logic;
 
-public class Hero extends PosElements{
+public class Hero extends Piece{
 	private boolean armed = false;
 	private boolean alive = true;
 	

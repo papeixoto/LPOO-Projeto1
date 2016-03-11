@@ -1,6 +1,6 @@
 package maze.logic;
 
-public class Dragon extends PosElements{
+public class Dragon extends Piece{
 	boolean alive;
 	boolean awake;
 	
