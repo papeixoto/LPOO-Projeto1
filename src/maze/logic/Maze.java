@@ -2,6 +2,7 @@ package maze.logic;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Random;
 import java.util.concurrent.ThreadLocalRandom;
 
 public class Maze {
@@ -10,33 +11,90 @@ public class Maze {
 	private Hero hero;
 	private Dragon dragon;
 	private Sword sword;
-	private boolean gameOver=false;
+	private boolean gameOver = false;
 	private String difficulty;
+	private int numDragoes;
+	private ArrayList<Dragon> dragons;
 
 	public Maze() {
+	
 		Terrain terrain = new Terrain();
 		board = terrain.getBoard();
-		hero = new Hero(1,1);
-		board[1][1]=hero.getSymbol();
-		dragon = new Dragon(3,1);
-		board[3][1]=dragon.getSymbol();
-		sword = new Sword(8,1);
+		hero = new Hero(1, 1);
+		board[1][1] = hero.getSymbol();
+		dragon = new Dragon(3, 1);
+		board[3][1] = dragon.getSymbol();
+		sword = new Sword(8, 1);
 		board[8][1] = sword.getSymbol();
+		dragons=new ArrayList();
 	}
-	
-	public Maze(char [][] board){
-		this.board=board;
-		
-		for(int x=0; x<board.length; x++)
-			for(int y=0; y<board[0].length;y++){
-				switch (board[x][y]){
-				case 'H': hero=new Hero(x,y); break;
-				case 'D': dragon=new Dragon(x,y); break;
-				case 'E': sword=new Sword(x,y);break;
+
+	public Maze(char[][] board) {
+		this.board = board;
+		int n = board.length-1;
+		Random rand = new Random();
+		for (int x = 0; x < board.length; x++)
+			for (int y = 0; y < board[0].length; y++) {
+				switch (board[x][y]) {
+				case 'H':
+					hero = new Hero(x, y);
+					break;
+				case 'D':
+					dragon = new Dragon(x, y);
+					break;
+				case 'E':
+					sword = new Sword(x, y);
+					break;
 				}
 			}
+		ArrayList<Dragon> dragons=new ArrayList();
+		
+		numDragoes=rand.nextInt((int)Math.sqrt(n)-1)+1;
+		
+		int heroX = rand.nextInt(n)+1;
+		int heroY = rand.nextInt(n)+1;
+		int swordX = rand.nextInt(n)+1;
+		int swordY = rand.nextInt(n)+1;
+		//gerar espada
+		while (board[swordX][swordY] != ' ') {
+			swordX = rand.nextInt(n)+1;
+			swordY = rand.nextInt(n)+1;
+		}
+		sword = new Sword(swordX, swordY);
+		board[swordX][swordY] = sword.getSymbol();
+		
+		//adicionar numero random de dragoes ao arraylist
+		for(int i=0;i<numDragoes;i++)
+		{
+		int dragonX =rand.nextInt(n)+1;
+		int dragonY = rand.nextInt(n)+1;
+		while (board[dragonX][dragonY] != ' ') {
+			dragonX = rand.nextInt(n)+1;
+			 dragonY = rand.nextInt(n)+1;
+		}
+		dragon= new Dragon(dragonX, dragonY);
+		board[dragonX][dragonY] = dragon.getSymbol();
+		dragons.add(new Dragon(dragonX,dragonY));
+		}
+		
+		// verificar posicoes dos dragoes adicionados
+		// gera heroi e verifica proximidade com dragoes
+		while (board[heroX][heroY] != ' ' || board[heroX + 1][heroY] == 'D' || board[heroX][heroY + 1] == 'D'
+				|| board[heroX - 1][heroY] == 'D' || board[heroX][heroY - 1] == 'D'
+				|| board[heroX + 1][heroY + 1] == 'D' || board[heroX + 1][heroY - 1] == 'D'
+				|| board[heroX - 1][heroY - 1] == 'D' || board[heroX - 1][heroY + 1] == 'D') {// System.out.println("tava
+																								// colado");
+			heroX = rand.nextInt(n)+1;
+			heroY = rand.nextInt(n)+1;
+		}
+		hero = new Hero(heroX, heroY);
+		board[heroX][heroY] = hero.getSymbol();
 	}
-	
+
+	/*public int random1toN(int c)
+	{Random rand = new Random();
+		return rand.nextInt(c)+1;
+	}*/
 	public char[][] getBoard(){
 		return board;
 	}
@@ -220,4 +278,3 @@ public class Maze {
 		setCell(x, y, hero.getSymbol());
 	}
 }
-
