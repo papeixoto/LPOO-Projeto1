@@ -6,47 +6,51 @@ package maze.cli;
 
 import java.util.Scanner;
 
-import maze.logic.IMazeBuilder;
 import maze.logic.Maze;
 import maze.logic.MazeBuilder;
+import maze.logic.IMazeBuilder;
 
 public class Game {
 
 	static public Scanner s = new Scanner(System.in);
 	static Maze maze;
 	boolean b=false;
-	
-	public static void main(String[] args) {
+		public static void main(String[] args) {
 		MazeBuilder mazeBuilder = new MazeBuilder();
-		maze = new Maze(mazeBuilder.buildMaze(31));
-		/*		String str=getDifficulty();
+		String str=getDifficulty();
+		maze = new Maze(mazeBuilder.buildMaze(getDim()));
 		printBoard(maze.getBoard());
 			while(!maze.getGameOver()){
-				if(str.equals("Easy"))
-					maze.updateEasy(getChar());
-				if(str.equals("Medium"))
-					maze.updateMedium(getChar());
-				if(str.equals("Hard"))
-					maze.updateHard(getChar());
-				else if(str!="Easy" || str!="Medium" || str!="Hard")
-				{System.out.println("Invalid Difficulty");
-				}
+				switch(str){
+					case "Easy":maze.updateEasy(getChar());
+					break;
+					case "Medium":maze.updateMedium(getChar());
+					break;
+					case "Hard":maze.updateHard(getChar());
+					break;
+					default:System.out.println("Invalid Difficulty");
+					str=getDifficulty();
+					break;}
 				
 					
 		printBoard(maze.getBoard());
-
 		}
-*/		
+
+		printEndGameMessage();
 		printBoard(maze.getBoard());
-	//	printEndGameMessage();
 			
 		s.close();
 	}
 
-
 	private static char getChar(){
 		System.out.println("movimento:");
 		char x = s.next().charAt(0);
+		return x;
+	}
+	
+	private static int getDim(){
+		System.out.println("dimensao?");
+		int x=s.nextInt();
 		return x;
 	}
 	public static String getDifficulty()
