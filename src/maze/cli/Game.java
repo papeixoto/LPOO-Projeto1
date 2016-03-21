@@ -16,9 +16,8 @@ public class Game {
 	static Maze maze;
 	boolean b=false;
 		public static void main(String[] args) {
-		MazeBuilder mazeBuilder = new MazeBuilder();
 		String str=getDifficulty();
-		maze = new Maze(mazeBuilder.buildMaze(getDim()));
+		maze = new Maze(getDim(), getNumberOfDragons());
 		printBoard(maze.getBoard());
 			while(!maze.getGameOver()){
 				switch(str){
@@ -53,6 +52,13 @@ public class Game {
 		int x=s.nextInt();
 		return x;
 	}
+	
+	private static int getNumberOfDragons(){
+		System.out.println("number of dragons?");
+		int x=s.nextInt();
+		return x;
+	}
+	
 	public static String getDifficulty()
 	{
 		System.out.println("Introduza a dificuldade");

@@ -17,6 +17,15 @@ public class TestMazeWithStaticDragon {
 			{'X', ' ', ' ', 'D', 'X'},
 			{'X', 'X', 'X', 'X', 'X'}};
 	
+	
+	@Test
+	public void testNewMaze(){
+		Maze maze = new Maze(11,1);
+		
+		assertEquals(maze.getDragons().size(), 1);
+		
+	}
+	
 	@Test
 	public void testMoveHeroToFreeCell() {
 	Maze maze = new Maze(m1);
@@ -61,14 +70,14 @@ public class TestMazeWithStaticDragon {
 		maze.getHero().setArmed(true);
 		assertEquals(maze.getHero().getArmed(),true);
 		maze.updateEasy('s');
-		assertEquals(maze.getDragon().getAlive(),false);
+		assertEquals(maze.getDragons().isEmpty(),true);
 		assertEquals(maze.getHero().getAlive(),true);
 	}
 	
 	@Test 
 	public void leaveLab(){
 		Maze maze=new Maze(m1);
-		maze.getDragon().setAlive(false);
+		maze.getDragons().remove(0);
 		maze.updateEasy('d');
 		assertEquals(maze.getGameOver(),true);
 	}

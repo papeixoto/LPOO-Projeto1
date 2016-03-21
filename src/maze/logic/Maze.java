@@ -1,6 +1,7 @@
 package maze.logic;
 
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Random;
 import java.util.concurrent.ThreadLocalRandom;
@@ -13,26 +14,15 @@ public class Maze {
 	private Sword sword;
 	private boolean gameOver = false;
 	private String difficulty;
-	private int numDragoes;
+	//	private int numDragoes;
 	private ArrayList<Dragon> dragons;
 
-	public Maze() {
-	
-		Terrain terrain = new Terrain();
-		board = terrain.getBoard();
-		hero = new Hero(1, 1);
-		board[1][1] = hero.getSymbol();
-		dragon = new Dragon(3, 1);
-		board[3][1] = dragon.getSymbol();
-		sword = new Sword(8, 1);
-		board[8][1] = sword.getSymbol();
-		dragons=new ArrayList();
-	}
 
-	public Maze(char[][] board) {
-		this.board = board;
-		int n = board.length-1;
-		Random rand = new Random();
+	public Maze(int size, int numOfDragons){
+		MazeBuilder mazeBuilder =  new MazeBuilder(size, numOfDragons);
+		board = mazeBuilder.getBoard();
+		dragons = new ArrayList<Dragon>();
+
 		for (int x = 0; x < board.length; x++)
 			for (int y = 0; y < board[0].length; y++) {
 				switch (board[x][y]) {
@@ -40,55 +30,32 @@ public class Maze {
 					hero = new Hero(x, y);
 					break;
 				case 'D':
-					dragon = new Dragon(x, y);
+					dragons.add(new Dragon(x, y));
 					break;
 				case 'E':
 					sword = new Sword(x, y);
 					break;
 				}
 			}
-		ArrayList<Dragon> dragons=new ArrayList();
-		
-		numDragoes=rand.nextInt((int)Math.sqrt(n)-1)+1;
-		
-		int heroX = rand.nextInt(n)+1;
-		int heroY = rand.nextInt(n)+1;
-		int swordX = rand.nextInt(n)+1;
-		int swordY = rand.nextInt(n)+1;
-		//gerar espada
-		while (board[swordX][swordY] != ' ') {
-			swordX = rand.nextInt(n)+1;
-			swordY = rand.nextInt(n)+1;
-		}
-		sword = new Sword(swordX, swordY);
-		board[swordX][swordY] = sword.getSymbol();
-		
-		//adicionar numero random de dragoes ao arraylist
-		for(int i=0;i<numDragoes;i++)
-		{
-		int dragonX =rand.nextInt(n)+1;
-		int dragonY = rand.nextInt(n)+1;
-		while (board[dragonX][dragonY] != ' ') {
-			dragonX = rand.nextInt(n)+1;
-			 dragonY = rand.nextInt(n)+1;
-		}
-		dragon= new Dragon(dragonX, dragonY);
-		board[dragonX][dragonY] = dragon.getSymbol();
-		dragons.add(new Dragon(dragonX,dragonY));
-		}
-		
-		// verificar posicoes dos dragoes adicionados
-		// gera heroi e verifica proximidade com dragoes
-		while (board[heroX][heroY] != ' ' || board[heroX + 1][heroY] == 'D' || board[heroX][heroY + 1] == 'D'
-				|| board[heroX - 1][heroY] == 'D' || board[heroX][heroY - 1] == 'D'
-				|| board[heroX + 1][heroY + 1] == 'D' || board[heroX + 1][heroY - 1] == 'D'
-				|| board[heroX - 1][heroY - 1] == 'D' || board[heroX - 1][heroY + 1] == 'D') {// System.out.println("tava
-																								// colado");
-			heroX = rand.nextInt(n)+1;
-			heroY = rand.nextInt(n)+1;
-		}
-		hero = new Hero(heroX, heroY);
-		board[heroX][heroY] = hero.getSymbol();
+	}
+
+	public Maze(char[][] board) {
+		this.board = board;
+		dragons = new ArrayList<Dragon>();
+		for (int x = 0; x < board.length; x++)
+			for (int y = 0; y < board[0].length; y++) {
+				switch (board[x][y]) {
+				case 'H':
+					hero = new Hero(x, y);
+					break;
+				case 'D':
+					dragons.add(new Dragon(x, y));
+					break;
+				case 'E':
+					sword = new Sword(x, y);
+					break;
+				}
+			}
 	}
 
 	/*public int random1toN(int c)
@@ -98,15 +65,12 @@ public class Maze {
 	public char[][] getBoard(){
 		return board;
 	}
-	
-	public Dragon getDragon()
+
+	public ArrayList<Dragon> getDragons()
 	{
-		return dragon;
+		return dragons;
 	}
 
-	private char getCell(int x, int y){
-		return board[x][y];
-	}
 
 	private void setCell(int x, int y, char cell){
 		board[x][y]=cell;
@@ -116,7 +80,7 @@ public class Maze {
 	public Hero getHero() {return hero;}
 
 	//update no easy, tirando o update dragons
-	
+
 	public void updateEasy(char c){
 		switch (c) {
 		case 'a': processHeroMoveEasy(hero.getX(), hero.getY()-1);break;
@@ -135,7 +99,7 @@ public class Maze {
 		default : System.out.println("Invalid command");
 		}
 	}
-	
+
 	public void updateHard(char c){
 		switch (c) {
 		case 'a': processHeroMove(hero.getX(), hero.getY()-1); if(!gameOver) updateHardDragons(); break;
@@ -145,83 +109,90 @@ public class Maze {
 		default : System.out.println("Invalid command");
 		}
 	}
-	
+
 	private void processHeroMoveEasy(int x, int y){
-		if (board[x][y] == 'S' && !dragon.getAlive()) {moveHero(x,y); gameOver=true; return;}
+		if (board[x][y] == 'S' && dragons.isEmpty()) {moveHero(x,y); gameOver=true; return;}
 		if (board[x][y] == ' ') moveHero(x, y);
 		if (board[x][y] == 'E') {hero.setArmed(true); moveHero(x, y);}
 		if (heroNextToDragon() && !hero.getArmed()) {gameOver=true; hero.setAlive(false);return;}
 		if (hero.getArmed()) killDragons();
 	}
-	
+
 	private void processHeroMove(int x, int y){
-		if (board[x][y] == 'S' && !dragon.getAlive()) {moveHero(x,y); gameOver=true; return;}
+		if (board[x][y] == 'S' && dragons.isEmpty()) {moveHero(x,y); gameOver=true; return;}
 		if (board[x][y] == ' ') moveHero(x, y);
 		if (board[x][y] == 'E') {hero.setArmed(true); moveHero(x, y);}
 		if (heroNextToDragon() && !hero.getArmed()) {gameOver=true; hero.setAlive(false);return;}
 		if (hero.getArmed()) killDragons();
 	}
-//update no modo em q o dragao se move aleatoriamente e tambem pode adormecer
+	//update no modo em q o dragao se move aleatoriamente e tambem pode adormecer
 	public void updateHardDragons() {
-		if(!dragon.getAlive()) return;
-		List<Integer> newCells = new ArrayList<Integer>();
+		for(int i=0; i<dragons.size();i++){
+			dragon=dragons.get(i);
+			List<Integer> newCells = new ArrayList<Integer>();
 
-		newCells.add(0);
-		if(dragon.getAwake()){
-		if(board[dragon.getX()-1][dragon.getY()]==' ' || board[dragon.getX()-1][dragon.getY()]==sword.getSymbol()) newCells.add(1);
-		if(board[dragon.getX()][dragon.getY()+1]==' ' ||board[dragon.getX()][dragon.getY()+1]==sword.getSymbol()) newCells.add(2);
-		if(board[dragon.getX()+1][dragon.getY()]==' ' ||board[dragon.getX()+1][dragon.getY()]==sword.getSymbol()) newCells.add(3);
-		if(board[dragon.getX()][dragon.getY()-1]==' ' ||board[dragon.getX()][dragon.getY()]==sword.getSymbol()) newCells.add(4);
-		}
-		if(gameOver==false){newCells.add(5);}
-		
-		switch (newCells.get(ThreadLocalRandom.current().nextInt(0, newCells.size()))){
-		case 0: moveDragon(dragon.getX(),dragon.getY()); 
-		System.out.println("dragon");break;
-		case 1: moveDragon(dragon.getX()-1,dragon.getY());
-		  System.out.println("up");break;
-		case 2: moveDragon(dragon.getX(),dragon.getY()+1);
-		  System.out.println("right");break;
-		case 3: moveDragon(dragon.getX()+1,dragon.getY());;
-		 System.out.println("down");break;
-		case 4: moveDragon(dragon.getX(),dragon.getY()-1);
-		 System.out.println("left");break;
-		case 5: 
-			if(dragon.getAwake()) {
-				dragon.setAwake(false);  System.out.println("Dragon Sleeping"); }
-		else  {dragon.setAwake(true);  System.out.println("Dragon Awake"); }
-			moveDragon(dragon.getX(),dragon.getY()); 
-		break;
-		default: System.out.println("Error can't move dragon");
-		}
+			newCells.add(0);
+			if(dragon.getAwake()){
+				if(board[dragon.getX()-1][dragon.getY()]==' ' || board[dragon.getX()-1][dragon.getY()]==sword.getSymbol()) newCells.add(1);
+				if(board[dragon.getX()][dragon.getY()+1]==' ' ||board[dragon.getX()][dragon.getY()+1]==sword.getSymbol()) newCells.add(2);
+				if(board[dragon.getX()+1][dragon.getY()]==' ' ||board[dragon.getX()+1][dragon.getY()]==sword.getSymbol()) newCells.add(3);
+				if(board[dragon.getX()][dragon.getY()-1]==' ' ||board[dragon.getX()][dragon.getY()]==sword.getSymbol()) newCells.add(4);
+			}
+			if(gameOver==false){newCells.add(5);}
 
-		if (heroNextToDragon()) {gameOver=true; hero.setAlive(false); return;}  
+			switch (newCells.get(ThreadLocalRandom.current().nextInt(0, newCells.size()))){
+			case 0: moveDragon(dragon.getX(),dragon.getY()); 
+			System.out.println("dragon");break;
+			case 1: moveDragon(dragon.getX()-1,dragon.getY());
+			System.out.println("up");break;
+			case 2: moveDragon(dragon.getX(),dragon.getY()+1);
+			System.out.println("right");break;
+			case 3: moveDragon(dragon.getX()+1,dragon.getY());;
+			System.out.println("down");break;
+			case 4: moveDragon(dragon.getX(),dragon.getY()-1);
+			System.out.println("left");break;
+			case 5: 
+				if(dragon.getAwake()) {
+					dragon.setAwake(false);  System.out.println("Dragon Sleeping"); }
+				else  {dragon.setAwake(true);  System.out.println("Dragon Awake"); }
+				moveDragon(dragon.getX(),dragon.getY()); 
+				break;
+			default: System.out.println("Error can't move dragon");
+			}
+
+			dragons.set(i, dragon);
+		}
+		if (heroNextToDragon() && !hero.getArmed()) {gameOver=true; hero.setAlive(false); return;}  
 		killDragons();
+
 	}
-//update no modo em que o dragao se move
+	//update no modo em que o dragao se move
 	public void updateMediumDragons() {
-		if(!dragon.getAlive()) return;
-		List<Integer> newCells = new ArrayList<Integer>();
+		for(int i=0; i<dragons.size();i++){
+			dragon=dragons.get(i);
 
-		newCells.add(0);
-		if(board[dragon.getX()-1][dragon.getY()]==' ' || board[dragon.getX()-1][dragon.getY()]==sword.getSymbol()) newCells.add(1);
-		if(board[dragon.getX()][dragon.getY()+1]==' ' ||board[dragon.getX()][dragon.getY()+1]==sword.getSymbol()) newCells.add(2);
-		if(board[dragon.getX()+1][dragon.getY()]==' ' ||board[dragon.getX()+1][dragon.getY()]==sword.getSymbol()) newCells.add(3);
-		if(board[dragon.getX()][dragon.getY()-1]==' ' ||board[dragon.getX()][dragon.getY()]==sword.getSymbol()) newCells.add(4);
+			if(!dragon.getAlive()) return;
+			List<Integer> newCells = new ArrayList<Integer>();
 
-		switch (newCells.get(ThreadLocalRandom.current().nextInt(0, newCells.size()))){
-		case 0: moveDragon(dragon.getX(),dragon.getY()); dragon.setAwake(true);
-		 dragon.setSymbol('D');System.out.println("dragon");break;
-		case 1: moveDragon(dragon.getX()-1,dragon.getY());dragon.setAwake(true);
-		 dragon.setSymbol('D'); System.out.println("up");break;
-		case 2: moveDragon(dragon.getX(),dragon.getY()+1);dragon.setAwake(true);
-		 dragon.setSymbol('D'); System.out.println("right");break;
-		case 3: moveDragon(dragon.getX()+1,dragon.getY());dragon.setAwake(true);
-		 dragon.setSymbol('D'); System.out.println("down");break;
-		case 4: moveDragon(dragon.getX(),dragon.getY()-1);dragon.setAwake(true);
-		 dragon.setSymbol('D'); System.out.println("left");break;
+			newCells.add(0);
+			if(board[dragon.getX()-1][dragon.getY()]==' ' || board[dragon.getX()-1][dragon.getY()]==sword.getSymbol()) newCells.add(1);
+			if(board[dragon.getX()][dragon.getY()+1]==' ' ||board[dragon.getX()][dragon.getY()+1]==sword.getSymbol()) newCells.add(2);
+			if(board[dragon.getX()+1][dragon.getY()]==' ' ||board[dragon.getX()+1][dragon.getY()]==sword.getSymbol()) newCells.add(3);
+			if(board[dragon.getX()][dragon.getY()-1]==' ' ||board[dragon.getX()][dragon.getY()]==sword.getSymbol()) newCells.add(4);
+
+			switch (newCells.get(ThreadLocalRandom.current().nextInt(0, newCells.size()))){
+			case 0: moveDragon(dragon.getX(),dragon.getY()); dragon.setAwake(true);
+			dragon.setSymbol('D');System.out.println("dragon");break;
+			case 1: moveDragon(dragon.getX()-1,dragon.getY());dragon.setAwake(true);
+			dragon.setSymbol('D'); System.out.println("up");break;
+			case 2: moveDragon(dragon.getX(),dragon.getY()+1);dragon.setAwake(true);
+			dragon.setSymbol('D'); System.out.println("right");break;
+			case 3: moveDragon(dragon.getX()+1,dragon.getY());dragon.setAwake(true);
+			dragon.setSymbol('D'); System.out.println("down");break;
+			case 4: moveDragon(dragon.getX(),dragon.getY()-1);dragon.setAwake(true);
+			dragon.setSymbol('D'); System.out.println("left");break;
+			}
 		}
-
 		if(!hero.getArmed() && heroNextToDragon()) 
 		{gameOver=true; hero.setAlive(false); return;} 
 		killDragons();
@@ -258,18 +229,23 @@ public class Maze {
 	}
 
 	public void killDragons(){
+
 		if(hero.getArmed()){
-			if(board[hero.getX()+1][hero.getY()]=='D') {board[hero.getX()+1][hero.getY()]=' '; dragon.setAlive(false);}
-			if(board[hero.getX()-1][hero.getY()]=='D') {board[hero.getX()-1][hero.getY()]=' '; dragon.setAlive(false);}
-			if(board[hero.getX()][hero.getY()+1]=='D') {board[hero.getX()][hero.getY()+1]=' '; dragon.setAlive(false);}
-			if(board[hero.getX()][hero.getY()-1]=='D') {board[hero.getX()][hero.getY()-1]=' '; dragon.setAlive(false);}
-			if(board[hero.getX()+1][hero.getY()+1]=='D') {board[hero.getX()+1][hero.getY()+1]=' '; dragon.setAlive(false);}
-			if(board[hero.getX()+1][hero.getY()-1]=='D') {board[hero.getX()+1][hero.getY()-1]=' '; dragon.setAlive(false);}
-			if(board[hero.getX()-1][hero.getY()+1]=='D') {board[hero.getX()-1][hero.getY()+1]=' '; dragon.setAlive(false);}
-			if(board[hero.getX()-1][hero.getY()-1]=='D') {board[hero.getX()-1][hero.getY()-1]=' '; dragon.setAlive(false);}
+			Iterator<Dragon> it = dragons.iterator();
+			while(it.hasNext()){
+				dragon=it.next();
+				if(hero.getX()+1==dragon.getX() && hero.getY()==dragon.getY()) {board[hero.getX()+1][hero.getY()]=' '; it.remove();}
+				if(hero.getX()-1==dragon.getX()&&hero.getY()==dragon.getY()) {board[hero.getX()-1][hero.getY()]=' '; it.remove(); }
+				if(hero.getX()==dragon.getX()&&hero.getY()+1==dragon.getY()) {board[hero.getX()][hero.getY()+1]=' '; it.remove(); }
+				if(hero.getX()==dragon.getX()&&hero.getY()-1==dragon.getY()) {board[hero.getX()][hero.getY()-1]=' '; it.remove(); }
+				if(hero.getX()+1==dragon.getX()&&hero.getY()+1==dragon.getY()) {board[hero.getX()+1][hero.getY()+1]=' '; it.remove(); }
+				if(hero.getX()+1==dragon.getX()&&hero.getY()-1==dragon.getY()) {board[hero.getX()+1][hero.getY()-1]=' '; it.remove(); }
+				if(hero.getX()-1==dragon.getX()&&hero.getY()+1==dragon.getY()) {board[hero.getX()-1][hero.getY()+1]=' '; it.remove(); }
+				if(hero.getX()-1==dragon.getX()&&hero.getY()-1==dragon.getY()) {board[hero.getX()-1][hero.getY()-1]=' '; it.remove(); }
+			}
 		}
-		
-		}
+
+	}
 
 	private void moveHero(int x, int y){
 		setCell(hero.getX(), hero.getY(), ' ');

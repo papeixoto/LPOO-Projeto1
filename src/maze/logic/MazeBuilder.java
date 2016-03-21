@@ -2,133 +2,79 @@ package maze.logic;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Random;
 import java.util.Stack;
 import java.util.concurrent.ThreadLocalRandom;
 
 public class MazeBuilder implements IMazeBuilder {
 
 	char[][] lab;
-	public char[][] visitedCells;
-	Piece guideCell;	
-	Stack<Piece> pathHistory;
 
-	public char[][] buildMaze(int size) throws IllegalArgumentException {
+
+	public MazeBuilder(int size, int numOfDragons) throws IllegalArgumentException {
 		if ((size & 1)==0) throw new IllegalArgumentException(); 
+		Terrain terrain = new Terrain(size);
+		lab = terrain.getBoard();
+		generatePieces(numOfDragons);
+	}
 
-		lab = new char[size][size];
-		visitedCells=new char[size/2][size/2];
-		guideCell = new Piece(0,0);
-		pathHistory = new Stack();
+//	public MazeBuilder() {}
+	
+/*	public char[][] buildMaze(int size){
+		Terrain terrain = new Terrain(size);
+		return terrain.getBoard();
+	}
+*/
+	private void generatePieces(int numOfDragons){
+		int n = lab.length-1;
+		Random rand = new Random();
+		ArrayList<Dragon> dragons=new ArrayList<Dragon>();
 
-		fill();
-		exit();
+//		numOfDragoes=rand.nextInt((int)Math.sqrt(n)-1)+1;
 
-		while(!pathHistory.isEmpty()){
-			generate();
-		//	print();
+		int heroX = rand.nextInt(n)+1;
+		int heroY = rand.nextInt(n)+1;
+		int swordX = rand.nextInt(n)+1;
+		int swordY = rand.nextInt(n)+1;
+		//gerar espada
+		while (lab[swordX][swordY] != ' ') {
+			swordX = rand.nextInt(n)+1;
+			swordY = rand.nextInt(n)+1;
+		}
+		Sword sword = new Sword(swordX, swordY);
+		lab[swordX][swordY] = sword.getSymbol();
+
+		//adicionar numero random de dragoes ao arraylist
+		for(int i=0;i<numOfDragons;i++)
+		{
+			int dragonX =rand.nextInt(n)+1;
+			int dragonY = rand.nextInt(n)+1;
+			while (lab[dragonX][dragonY] != ' ') {
+				dragonX = rand.nextInt(n)+1;
+				dragonY = rand.nextInt(n)+1;
+			}
+			Dragon dragon= new Dragon(dragonX, dragonY);
+			lab[dragonX][dragonY] = dragon.getSymbol();
+			dragons.add(new Dragon(dragonX,dragonY));
 		}
 
-	return lab;
-}
-
-private void print() {
-	for(char[] row:lab){
-		for(char cell:row){
-			System.out.print(cell);
-			System.out.print(' ');
+		// verificar posicoes dos dragoes adicionados
+		// gera heroi e verifica proximidade com dragoes
+		while (lab[heroX][heroY] != ' ' || lab[heroX + 1][heroY] == 'D' || lab[heroX][heroY + 1] == 'D'
+				|| lab[heroX - 1][heroY] == 'D' || lab[heroX][heroY - 1] == 'D'
+				|| lab[heroX + 1][heroY + 1] == 'D' || lab[heroX + 1][heroY - 1] == 'D'
+				|| lab[heroX - 1][heroY - 1] == 'D' || lab[heroX - 1][heroY + 1] == 'D') {// System.out.println("tava
+			// colado");
+			heroX = rand.nextInt(n)+1;
+			heroY = rand.nextInt(n)+1;
 		}
-		System.out.println();
+		Hero hero = new Hero(heroX, heroY);
+		lab[heroX][heroY] = hero.getSymbol();
 	}
 	
-	for(char[] row:visitedCells){
-		for(char cell:row){
-			System.out.print(cell);
-			System.out.print(' ');
-		}
-		System.out.println();
+	public char[][] getBoard(){
+		return lab;
 	}
-	
-	System.out.print(guideCell.getX()); 
-	System.out.println(guideCell.getY()); 
-		
-	}
-
-private void fill(){
-	for(int x=0; x<lab.length; x++)
-		for(int y=0; y<lab.length; y++){
-			if(x == 0 || y == 0 || x == lab.length-1 || y == lab.length-1  || ((x & 1) == 0 || (y & 1) == 0))
-				lab[x][y] = 'X';
-			else lab[x][y] = ' ';
-		}
-
-	for(char[] line:visitedCells)
-		for(char cell:line)
-			cell = '.';
-}
-
-private void exit(){
-	int random1 = ThreadLocalRandom.current().nextInt(0, 4);
-	int random2 = ThreadLocalRandom.current().nextInt(0, (lab.length-1)/2);
-
-	switch(random1){
-	case 0: 
-		guideCell.setY(lab.length-1);
-		guideCell.setX(random2*2+1);
-		break;
-	case 1: 
-		guideCell.setX(lab.length-1);
-		guideCell.setY(random2*2+1);
-		break;
-	case 2: 
-		guideCell.setY(0);
-		guideCell.setX(random2*2+1);
-		break;
-	case 3: 
-		guideCell.setX(0); 
-		guideCell.setY(random2*2+1);
-		break;
-	}
-
-
-	lab[guideCell.posX][guideCell.posY] = 'S';
-	guideCell.setX((guideCell.posX-1)/2);
-	guideCell.setY((guideCell.posY-1)/2);
-	visitedCells[guideCell.posX][guideCell.posY] = '+';
-
-	pathHistory.push(guideCell);
-}
-
-void generate(){
-	List<Integer> newCells = new ArrayList<Integer>();
-
-	int x = guideCell.getX();
-	int y = guideCell.getY();
-
-	if(x-1>=0 && visitedCells[x-1][y]!='+') newCells.add(0);
-	if(y+1<visitedCells.length && visitedCells[x][y+1]!='+') newCells.add(1);
-	if(x+1<visitedCells.length && visitedCells[x+1][y]!='+') newCells.add(2);
-	if(y-1>=0 && visitedCells[x][y-1]!='+') newCells.add(3);
-
-	if(newCells.size()==0) {
-		Piece temp = pathHistory.pop();
-		guideCell.setX(temp.getX()); 
-		guideCell.setY(temp.getY()); 
-		
-		return;
-	}
-
-	switch (newCells.get(ThreadLocalRandom.current().nextInt(0, newCells.size()))){
-	case 0: guideCell.setX(x-1); break;
-	case 1: guideCell.setY(y+1); break;
-	case 2: guideCell.setX(x+1); break;
-	case 3: guideCell.setY(y-1); break;
-	}
-
-	lab[(guideCell.getX()+x)+1][(guideCell.getY()+y)+1]=' ';
-	visitedCells[guideCell.getX()][guideCell.getY()]='+';
-	Piece temp = new Piece(guideCell.getX(),guideCell.getY());
-	pathHistory.push(temp);
-}
 
 
 
