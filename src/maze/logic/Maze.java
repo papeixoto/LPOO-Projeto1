@@ -62,6 +62,20 @@ public class Maze {
 	{Random rand = new Random();
 		return rand.nextInt(c)+1;
 	}*/
+
+	public String toString(){
+		String string = "";
+		
+		for(char[] row:board){
+			for(char cell:row){
+				string += cell + " ";
+			}
+			string+="\n";
+		}
+		
+		return string;
+	}
+	
 	public char[][] getBoard(){
 		return board;
 	}
