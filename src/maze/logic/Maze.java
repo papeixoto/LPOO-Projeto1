@@ -13,7 +13,7 @@ public class Maze {
 	private Dragon dragon;
 	private Sword sword;
 	private boolean gameOver = false;
-	private String difficulty;
+	private int difficulty; //0,1,2
 	//	private int numDragoes;
 	private ArrayList<Dragon> dragons;
 
@@ -57,7 +57,9 @@ public class Maze {
 				}
 			}
 	}
-
+	public void setDifficulty(int d){
+		difficulty=d;
+	}
 	/*public int random1toN(int c)
 	{Random rand = new Random();
 		return rand.nextInt(c)+1;
@@ -93,8 +95,23 @@ public class Maze {
 	public boolean getGameOver() {return gameOver;}
 	public Hero getHero() {return hero;}
 
+	public void update(char c){
+		switch (difficulty) {
+		case 0:
+			updateEasy(c);
+			break;
+		case 1:
+			updateMedium(c);
+			break;
+		case 3:
+			updateHard(c);
+			break;
+		default:
+			break;
+		}
+	}
+	
 	//update no easy, tirando o update dragons
-
 	public void updateEasy(char c){
 		switch (c) {
 		case 'a': processHeroMoveEasy(hero.getX(), hero.getY()-1);break;
