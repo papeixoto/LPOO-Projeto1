@@ -1,8 +1,8 @@
 package maze.gui;
 
 import java.awt.Component;
+import java.awt.Dimension;
 import java.awt.EventQueue;
-
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JTextArea;
@@ -23,6 +23,7 @@ import com.jgoodies.forms.layout.RowSpec;
 
 public class Interface {
 
+	private JFrame images;
 	private JFrame frame;
 	private JTextField tfSize;
 	private JTextField tfDragon;
@@ -33,6 +34,8 @@ public class Interface {
 	private JButton btnBaixo;
 	private JButton btnEsquerda;
 	private JButton btnDireita;
+	private Draw_maze panel=new Draw_maze();
+
 	/**
 	 * Launch the application.
 	 */
@@ -60,6 +63,22 @@ public class Interface {
 	 * Initialize the contents of the frame.
 	 */
 	private void initialize() {
+	//mostrar imagem dragao
+		images = new JFrame();
+		images.setTitle("Graphics Demo");
+		images.setBounds(100, 100, 450, 300);
+		images.setPreferredSize(new Dimension(450, 300));
+		images.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+		
+		Draw_maze panel = new Draw_maze();
+		images.getContentPane().add(panel);
+
+		images.pack();
+		
+		images.setVisible(true);
+		
+		panel.requestFocus();;
+		//------------------------
 		frame = new JFrame();
 		frame.getContentPane().setFont(new Font("Courier New", Font.PLAIN, 11));
 		frame.setResizable(false);
