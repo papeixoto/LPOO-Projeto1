@@ -96,6 +96,7 @@ public class Maze {
 	public Hero getHero() {return hero;}
 
 	public void update(char c){
+		if(!gameOver)
 		switch (difficulty) {
 		case 0:
 			updateEasy(c);
@@ -103,7 +104,7 @@ public class Maze {
 		case 1:
 			updateMedium(c);
 			break;
-		case 3:
+		case 2:
 			updateHard(c);
 			break;
 		default:
@@ -167,7 +168,7 @@ public class Maze {
 				if(board[dragon.getX()-1][dragon.getY()]==' ' || board[dragon.getX()-1][dragon.getY()]==sword.getSymbol()) newCells.add(1);
 				if(board[dragon.getX()][dragon.getY()+1]==' ' ||board[dragon.getX()][dragon.getY()+1]==sword.getSymbol()) newCells.add(2);
 				if(board[dragon.getX()+1][dragon.getY()]==' ' ||board[dragon.getX()+1][dragon.getY()]==sword.getSymbol()) newCells.add(3);
-				if(board[dragon.getX()][dragon.getY()-1]==' ' ||board[dragon.getX()][dragon.getY()]==sword.getSymbol()) newCells.add(4);
+				if(board[dragon.getX()][dragon.getY()-1]==' ' ||board[dragon.getX()][dragon.getY()-1]==sword.getSymbol()) newCells.add(4);
 			}
 			if(gameOver==false){newCells.add(5);}
 
@@ -209,7 +210,7 @@ public class Maze {
 			if(board[dragon.getX()-1][dragon.getY()]==' ' || board[dragon.getX()-1][dragon.getY()]==sword.getSymbol()) newCells.add(1);
 			if(board[dragon.getX()][dragon.getY()+1]==' ' ||board[dragon.getX()][dragon.getY()+1]==sword.getSymbol()) newCells.add(2);
 			if(board[dragon.getX()+1][dragon.getY()]==' ' ||board[dragon.getX()+1][dragon.getY()]==sword.getSymbol()) newCells.add(3);
-			if(board[dragon.getX()][dragon.getY()-1]==' ' ||board[dragon.getX()][dragon.getY()]==sword.getSymbol()) newCells.add(4);
+			if(board[dragon.getX()][dragon.getY()-1]==' ' ||board[dragon.getX()][dragon.getY()-1]==sword.getSymbol()) newCells.add(4);
 
 			switch (newCells.get(ThreadLocalRandom.current().nextInt(0, newCells.size()))){
 			case 0: moveDragon(dragon.getX(),dragon.getY()); dragon.setAwake(true);
