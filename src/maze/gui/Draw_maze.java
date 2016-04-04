@@ -29,6 +29,10 @@ public class Draw_maze extends JPanel {
 	private BufferedImage sword;
 	private BufferedImage blank;
 	private BufferedImage wall;
+	private BufferedImage dragonSleep;
+	private BufferedImage exit;
+	private BufferedImage heroArmed;
+	private BufferedImage dragonSword;
 	private Maze maze;
 
 	public Draw_maze(Maze maze) {
@@ -40,6 +44,10 @@ public class Draw_maze extends JPanel {
 			sword =  ImageIO.read(new File("sword.jpg"));
 			blank =  ImageIO.read(new File("blank.jpg"));
 			wall =  ImageIO.read(new File("wall.jpg"));
+			dragonSleep = ImageIO.read(new File("dragonS.jpg"));
+			exit=ImageIO.read(new File ("exit.jpg"));
+			heroArmed=ImageIO.read(new File("heroeArmed.jpg"));
+			dragonSword=ImageIO.read(new File("dragonSword.jpg"));
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
@@ -75,10 +83,9 @@ public class Draw_maze extends JPanel {
 		super.paintComponent(g); // clears the backgorund ...
 		int frameDimension = 600;
 		char [][] board = maze.getBoard();
-		//	int x=0,y=0,width=100, height=100;
+		
 		int width = frameDimension/board.length ;
 		int height = frameDimension/board.length ;
-		//g.drawImage(hero, x, y, x + width - 1, y + height - 1, 0, 0, hero.getWidth(), hero.getHeight(), null);
 
 		for (int i = 0; i < board.length; i++) {
 			for (int  k= 0; k < board[i].length; k++) {
@@ -92,11 +99,23 @@ public class Draw_maze extends JPanel {
 				case 'D':
 					g.drawImage(dragon, k*width, i*height, width, height , null);
 					break;
+				case 'd':
+					g.drawImage(dragonSleep, k*width, i*height, width, height , null);
+					break;
+				case 'S':
+					g.drawImage(exit, k*width, i*height, width, height , null);
+					break;
 				case 'X':
 					g.drawImage(wall, k*width, i*height, width, height , null);
 					break;
 				case ' ':
 					g.drawImage(blank, k*width, i*height, width, height , null);
+					break;
+				case 'A':
+					g.drawImage(heroArmed, k*width, i*height, width, height , null);
+					break;
+				case 'F':
+					g.drawImage(dragonSword, k*width, i*height, width, height , null);
 					break;
 				default:
 					break;
@@ -122,17 +141,4 @@ class KeyAction extends AbstractAction {
 		i.updateMaze(actionEvt.getActionCommand().charAt(0));
 	}
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
 
