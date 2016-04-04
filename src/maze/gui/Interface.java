@@ -29,8 +29,11 @@ import com.jgoodies.forms.layout.FormLayout;
 import com.jgoodies.forms.layout.ColumnSpec;
 import com.jgoodies.forms.layout.FormSpecs;
 import com.jgoodies.forms.layout.RowSpec;
+import com.sun.istack.internal.NotNull;
+
 import javax.swing.JPanel;
 import java.awt.Color;
+import javax.swing.SwingConstants;
 
 
 
@@ -53,6 +56,11 @@ public class Interface {
 	private JButton btnEsquerda;
 	private JButton btnDireita;
 	private Draw_maze panel;
+	private createMaze panelCreate;
+	private JButton btnNewButton_1;
+	
+	private String iSize = "11";
+	private String iDragon = "1";
 
 
 	/**
@@ -90,6 +98,10 @@ public class Interface {
 		frame.getContentPane().setFont(new Font("Courier New", Font.PLAIN, 11));
 		frame.setBounds(100, 100, 498, 373);
 		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+		Dimension d = new Dimension(800,800);
+        frame.getContentPane().setPreferredSize(d);
+        frame.pack();
+        frame.setResizable(false);
 		frame.getContentPane().setLayout(new FormLayout(new ColumnSpec[] {
 				FormSpecs.UNRELATED_GAP_COLSPEC,
 				ColumnSpec.decode("133px:grow"),
@@ -101,29 +113,72 @@ public class Interface {
 				ColumnSpec.decode("82px"),
 				FormSpecs.UNRELATED_GAP_COLSPEC,
 				ColumnSpec.decode("79px"),},
-				new RowSpec[] {
-						FormSpecs.RELATED_GAP_ROWSPEC,
-						RowSpec.decode("23px"),
-						FormSpecs.LABEL_COMPONENT_GAP_ROWSPEC,
-						RowSpec.decode("23px"),
-						FormSpecs.PARAGRAPH_GAP_ROWSPEC,
-						RowSpec.decode("20px"),
-						RowSpec.decode("23px"),
-						RowSpec.decode("33px:grow"),
-						FormSpecs.UNRELATED_GAP_ROWSPEC,
-						RowSpec.decode("23px"),
-						FormSpecs.UNRELATED_GAP_ROWSPEC,
-						RowSpec.decode("112px"),
-						FormSpecs.PARAGRAPH_GAP_ROWSPEC,
-						RowSpec.decode("14px"),}));
+			new RowSpec[] {
+				FormSpecs.RELATED_GAP_ROWSPEC,
+				RowSpec.decode("23px"),
+				FormSpecs.LABEL_COMPONENT_GAP_ROWSPEC,
+				RowSpec.decode("23px"),
+				FormSpecs.PARAGRAPH_GAP_ROWSPEC,
+				RowSpec.decode("20px"),
+				RowSpec.decode("23px"),
+				RowSpec.decode("33px:grow"),
+				FormSpecs.UNRELATED_GAP_ROWSPEC,
+				RowSpec.decode("23px"),
+				FormSpecs.UNRELATED_GAP_ROWSPEC,
+				RowSpec.decode("112px"),
+				FormSpecs.RELATED_GAP_ROWSPEC,
+				FormSpecs.DEFAULT_ROWSPEC,
+				FormSpecs.PARAGRAPH_GAP_ROWSPEC,
+				RowSpec.decode("14px"),}));
 
 		JLabel lblNewLabel = new JLabel("Dimensão do labirinto");
 		frame.getContentPane().add(lblNewLabel, "2, 2, center, center");
+		
+		
+		tfSize = new JTextField();
+		tfSize.setText(iSize);
+		frame.getContentPane().add(tfSize, "4, 2, left, center");
+		tfSize.setColumns(10);
+
+		tfDragon = new JTextField();
+		tfDragon.setText(iDragon);
+		frame.getContentPane().add(tfDragon, "4, 4, left, center");
+		tfDragon.setColumns(10);
+		
+		maze = new Maze(Integer.parseInt(iSize), Integer.parseInt(iDragon));
+		panelCreate = new createMaze(Integer.parseInt(tfSize.getText()));
+		//frame.getContentPane().add(panelCreate, "2, 8, 3, 5, fill, fill");
+		panel=new Draw_maze(maze);
+		panel.setVisible(false);
+		frame.getContentPane().add(panel, "2, 8, 3, 5, fill, fill");
+		
+		
+		btnNewButton_1 = new JButton("Criar");
+		btnNewButton_1.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent arg0) {
+				if ( ( Integer.parseInt(tfSize.getText()) & 1) == 0 || Integer.parseInt(tfDragon.getText()) > Integer.parseInt(tfSize.getText())){
+					lblPodeGerarNovo.setText("tamanho do labirinto ou número de dragões inválidos");
+					return;
+				}
+				panel.setVisible(false);
+		//		frame.remove(panelCreate);
+				panelCreate = new createMaze(Integer.parseInt(tfSize.getText()));
+				panelCreate.setVisible(true);
+				panelCreate.revalidate();
+				
+				btnCima.setEnabled(false);
+				btnBaixo.setEnabled(false);
+				btnEsquerda.setEnabled(false);
+				btnDireita.setEnabled(false);
+			}
+		});
+		frame.getContentPane().add(btnNewButton_1, "10, 2");
 
 		JLabel lblNewLabel_1 = new JLabel("Número de dragões");
 		frame.getContentPane().add(lblNewLabel_1, "2, 4, center, center");
 
 		JLabel lblNewLabel_2 = new JLabel("Tipo de dragões");
+		lblNewLabel_2.setHorizontalAlignment(SwingConstants.CENTER);
 		frame.getContentPane().add(lblNewLabel_2, "2, 6, fill, center");
 
 		JComboBox comboBox = new JComboBox();
@@ -173,7 +228,7 @@ public class Interface {
 		frame.getContentPane().add(btnDireita, "10, 10, fill, top");
 
 		lblPodeGerarNovo = new JLabel("Pode gerar novo labirinto");
-		frame.getContentPane().add(lblPodeGerarNovo, "2, 14, 3, 1, fill, top");
+		frame.getContentPane().add(lblPodeGerarNovo, "2, 16, 3, 1, fill, top");
 
 		JButton btnGerarLabirinto = new JButton("Gerar novo labirinto");
 		btnGerarLabirinto.addActionListener(new ActionListener() {
@@ -193,15 +248,12 @@ public class Interface {
 				btnEsquerda.setEnabled(true);
 				btnDireita.setEnabled(true);
 				lblPodeGerarNovo.setText("Em jogo - Movimente o seu herói");
-				if(panel == null)	{
-					panel = new Draw_maze(maze);
-					frame.getContentPane().add(panel, "2, 8, 3, 5, fill, fill");
-				}
-				else {panel.setMaze(maze); panel.repaint();}
+				panelCreate.setVisible(false);
+				panel.setVisible(true);panel.setMaze(maze); panel.repaint();
 				
 			}
 		});
-		frame.getContentPane().add(btnGerarLabirinto, "6, 2, 5, 1, left, top");
+		frame.getContentPane().add(btnGerarLabirinto, "6, 2, 3, 1, default, top");
 
 		JButton btnNewButton = new JButton("Terminar programa");
 		btnNewButton.addActionListener(new ActionListener() {
@@ -209,17 +261,9 @@ public class Interface {
 				System.exit(0);
 			}
 		});
-		frame.getContentPane().add(btnNewButton, "6, 4, 5, 1, left, top");
+		frame.getContentPane().add(btnNewButton, "6, 4, 5, 1, default, top");
 
-		tfSize = new JTextField();
-		tfSize.setText("11");
-		frame.getContentPane().add(tfSize, "4, 2, left, center");
-		tfSize.setColumns(10);
-
-		tfDragon = new JTextField();
-		tfDragon.setText("1");
-		frame.getContentPane().add(tfDragon, "4, 4, left, center");
-		tfDragon.setColumns(10);
+		
 
 
 	}

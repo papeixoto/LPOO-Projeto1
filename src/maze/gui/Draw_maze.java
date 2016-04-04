@@ -63,8 +63,6 @@ public class Draw_maze extends JPanel {
 		actionMap.put(vkRight, new KeyAction(vkRight));
 		actionMap.put(vkUp, new KeyAction(vkUp));
 		actionMap.put(vkDown, new KeyAction(vkDown));
-
-
 	}
 
 
@@ -75,7 +73,7 @@ public class Draw_maze extends JPanel {
 
 	public void paintComponent(Graphics g) {
 		super.paintComponent(g); // clears the backgorund ...
-		int frameDimension = 200;
+		int frameDimension = 600;
 		char [][] board = maze.getBoard();
 		//	int x=0,y=0,width=100, height=100;
 		int width = frameDimension/board.length ;
