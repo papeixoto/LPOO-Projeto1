@@ -13,11 +13,11 @@ public class Maze {
 	private Dragon dragon;
 	private Sword sword;
 	private boolean gameOver = false;
-	private int difficulty; //0,1,2
-	//	private int numDragoes;
+	private int difficulty; 
 	private ArrayList<Dragon> dragons;
 
 
+	/**Maze constructor for Board generated in MazeBuilder*/
 	public Maze(int size, int numOfDragons){
 		MazeBuilder mazeBuilder =  new MazeBuilder(size, numOfDragons);
 		board = mazeBuilder.getBoard();
@@ -39,6 +39,7 @@ public class Maze {
 			}
 	}
 
+	/**Maze constructor for default Board*/
 	public Maze(char[][] board) {
 		this.board = board;
 		dragons = new ArrayList<Dragon>();
@@ -57,14 +58,13 @@ public class Maze {
 				}
 			}
 	}
+	
+	/**set game difficulty*/
 	public void setDifficulty(int d){
 		difficulty=d;
 	}
-	/*public int random1toN(int c)
-	{Random rand = new Random();
-		return rand.nextInt(c)+1;
-	}*/
-
+	
+	/**Board as a string*/
 	public String toString(){
 		String string = "";
 		
@@ -78,23 +78,29 @@ public class Maze {
 		return string;
 	}
 	
+	/** get Board*/
 	public char[][] getBoard(){
 		return board;
 	}
 
+	/** get ArrayList of dragons*/
 	public ArrayList<Dragon> getDragons()
 	{
 		return dragons;
 	}
 
-
+	/** set a specific board position with cell*/ 
 	private void setCell(int x, int y, char cell){
 		board[x][y]=cell;
 	}
 
+	/** check if game has finished*/
 	public boolean getGameOver() {return gameOver;}
+	
+	/** get Hero*/
 	public Hero getHero() {return hero;}
 
+	/** update the game according to the difficulty*/
 	public void update(char c){
 		if(!gameOver)
 		switch (difficulty) {
@@ -112,16 +118,18 @@ public class Maze {
 		}
 	}
 	
-	//update no easy, tirando o update dragons
+	/** update game in easy difficulty*/
 	public void updateEasy(char c){
 		switch (c) {
-		case 'a': processHeroMoveEasy(hero.getX(), hero.getY()-1);break;
-		case 's': processHeroMoveEasy(hero.getX()+1, hero.getY());break;
-		case 'd': processHeroMoveEasy(hero.getX(), hero.getY()+1);break;
-		case 'w': processHeroMoveEasy(hero.getX()-1, hero.getY());break;
+		case 'a': processHeroMove(hero.getX(), hero.getY()-1);break;
+		case 's': processHeroMove(hero.getX()+1, hero.getY());break;
+		case 'd': processHeroMove(hero.getX(), hero.getY()+1);break;
+		case 'w': processHeroMove(hero.getX()-1, hero.getY());break;
 		default : System.out.println("Invalid command");
 		}
 	}
+	
+	/** update game in medium difficulty*/
 	public void updateMedium(char c){
 		switch (c) {
 		case 'a': processHeroMove(hero.getX(), hero.getY()-1); if(!gameOver) updateMediumDragons(); break;
@@ -132,6 +140,7 @@ public class Maze {
 		}
 	}
 
+	/** update game in hard difficulty*/
 	public void updateHard(char c){
 		switch (c) {
 		case 'a': processHeroMove(hero.getX(), hero.getY()-1); if(!gameOver) updateHardDragons(); break;
@@ -142,14 +151,7 @@ public class Maze {
 		}
 	}
 
-	private void processHeroMoveEasy(int x, int y){
-		if (board[x][y] == 'S' && dragons.isEmpty()) {moveHero(x,y); gameOver=true; return;}
-		if (board[x][y] == ' ') moveHero(x, y);
-		if (board[x][y] == 'E') {hero.setArmed(true); moveHero(x, y);}
-		if (heroNextToDragon() && !hero.getArmed()) {gameOver=true; hero.setAlive(false);return;}
-		if (hero.getArmed()) killDragons();
-	}
-
+	/** process hero movement,if he can move to position(x,y) if he can leave the maze and if he kills or dies when near a dragon */
 	private void processHeroMove(int x, int y){
 		if (board[x][y] == 'S' && dragons.isEmpty()) {moveHero(x,y); gameOver=true; return;}
 		if (board[x][y] == ' ') moveHero(x, y);
@@ -157,7 +159,8 @@ public class Maze {
 		if (heroNextToDragon() && !hero.getArmed()) {gameOver=true; hero.setAlive(false);return;}
 		if (hero.getArmed()) killDragons();
 	}
-	//update no modo em q o dragao se move aleatoriamente e tambem pode adormecer
+	
+	/**update in hard difficulty, dragon movement is random and he can fall asleep*/
 	public void updateHardDragons() {
 		for(int i=0; i<dragons.size();i++){
 			dragon=dragons.get(i);
@@ -198,7 +201,7 @@ public class Maze {
 		killDragons();
 
 	}
-	//update no modo em que o dragao se move
+	/**update in medium difficulty, dragon starts moving randomly*/
 	public void updateMediumDragons() {
 		for(int i=0; i<dragons.size();i++){
 			dragon=dragons.get(i);
@@ -230,6 +233,7 @@ public class Maze {
 		killDragons();
 	}
 
+	/** if (x,y) is empty or a sword, moves dragon to that position*/
 	private void moveDragon(int x, int y) {
 		if(x==sword.getX() && y==sword.getY() && sword.getAvailable()){
 			board[dragon.getX()][dragon.getY()]=' ';
@@ -248,6 +252,7 @@ public class Maze {
 		}
 	}
 
+	/** check if hero is next to dragon*/
 	public boolean heroNextToDragon(){
 		if(board[hero.getX()+1][hero.getY()]=='D') return true;
 		if(board[hero.getX()-1][hero.getY()]=='D') return true;
@@ -260,6 +265,7 @@ public class Maze {
 		return false;
 	}
 
+	/** hero kills some dragon when he is armed and next to it*/
 	public void killDragons(){
 
 		if(hero.getArmed()){
@@ -279,6 +285,7 @@ public class Maze {
 
 	}
 
+	/** moves hero to (x,y)*/
 	private void moveHero(int x, int y){
 		setCell(hero.getX(), hero.getY(), ' ');
 		hero.setX(x);

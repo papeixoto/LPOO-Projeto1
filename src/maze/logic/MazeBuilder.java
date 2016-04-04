@@ -10,7 +10,7 @@ public class MazeBuilder implements IMazeBuilder {
 
 	char[][] lab;
 
-
+/** MazeBuilder constructor*/
 	public MazeBuilder(int size, int numOfDragons) throws IllegalArgumentException {
 		if ((size & 1)==0) throw new IllegalArgumentException(); 
 		Terrain terrain = new Terrain(size);
@@ -18,25 +18,19 @@ public class MazeBuilder implements IMazeBuilder {
 		generatePieces(numOfDragons);
 	}
 
-//	public MazeBuilder() {}
 	
-/*	public char[][] buildMaze(int size){
-		Terrain terrain = new Terrain(size);
-		return terrain.getBoard();
-	}
-*/
+	/** generate Board with the intended number of dragons and all characters in random positions*/
 	private void generatePieces(int numOfDragons){
 		int n = lab.length-1;
 		Random rand = new Random();
 		ArrayList<Dragon> dragons=new ArrayList<Dragon>();
 
-//		numOfDragoes=rand.nextInt((int)Math.sqrt(n)-1)+1;
 
 		int heroX = rand.nextInt(n)+1;
 		int heroY = rand.nextInt(n)+1;
 		int swordX = rand.nextInt(n)+1;
 		int swordY = rand.nextInt(n)+1;
-		//gerar espada
+		//generate sword
 		while (lab[swordX][swordY] != ' ') {
 			swordX = rand.nextInt(n)+1;
 			swordY = rand.nextInt(n)+1;
@@ -44,7 +38,7 @@ public class MazeBuilder implements IMazeBuilder {
 		Sword sword = new Sword(swordX, swordY);
 		lab[swordX][swordY] = sword.getSymbol();
 
-		//adicionar numero random de dragoes ao arraylist
+		//generate the intended number of dragons 
 		for(int i=0;i<numOfDragons;i++)
 		{
 			int dragonX =rand.nextInt(n)+1;
@@ -58,13 +52,13 @@ public class MazeBuilder implements IMazeBuilder {
 			dragons.add(new Dragon(dragonX,dragonY));
 		}
 
-		// verificar posicoes dos dragoes adicionados
-		// gera heroi e verifica proximidade com dragoes
+		
+		//generate hero and check his proximity to dragons 
 		while (lab[heroX][heroY] != ' ' || lab[heroX + 1][heroY] == 'D' || lab[heroX][heroY + 1] == 'D'
 				|| lab[heroX - 1][heroY] == 'D' || lab[heroX][heroY - 1] == 'D'
 				|| lab[heroX + 1][heroY + 1] == 'D' || lab[heroX + 1][heroY - 1] == 'D'
-				|| lab[heroX - 1][heroY - 1] == 'D' || lab[heroX - 1][heroY + 1] == 'D') {// System.out.println("tava
-			// colado");
+				|| lab[heroX - 1][heroY - 1] == 'D' || lab[heroX - 1][heroY + 1] == 'D') {
+			
 			heroX = rand.nextInt(n)+1;
 			heroY = rand.nextInt(n)+1;
 		}
@@ -72,6 +66,7 @@ public class MazeBuilder implements IMazeBuilder {
 		lab[heroX][heroY] = hero.getSymbol();
 	}
 	
+	/** get Board*/
 	public char[][] getBoard(){
 		return lab;
 	}
